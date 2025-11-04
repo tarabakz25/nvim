@@ -1,157 +1,159 @@
 return {
-  -- ★ VSCode/Cursor 内では Neovim の LSP を起動しない
   {
     "neovim/nvim-lspconfig",
-    cond = not vim.g.vscode,
     event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+    },
     config = function()
-      -- diagnostics 表示・サイン・UI
-      local signs = { Error = " ", Warn = " ", Hint = "󰌵 ", Info = " " }
-      for type, icon in pairs(signs) do
-        local hl = "DiagnosticSign" .. type
-        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-      end
-      vim.diagnostic.config({
-        virtual_text = { prefix = "●", spacing = 2 },
-        signs = true,
-        underline = true,
-        update_in_insert = false,
-        severity_sort = true,
-        float = { border = "rounded", source = "if_many" },
-      })
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+      vim.filetype.add({ extension = { ino = "arduino" } })
 
-      -- capabilities (nvim-cmp 連携)
+      local lspconfig = require("lspconfig")
+      local util = require("lspconfig.util")
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
         capabilities = cmp_lsp.default_capabilities(capabilities)
       end
 
-      -- on_attach: 共通キーマップ等
-      local on_attach = function(client, bufnr)
+      local function board_fqbn()
+        local fqbn = vim.g.arduino_fqbn or os.getenv("ARDUINO_FQBN")
+        if fqbn and fqbn ~= "" then
+          return fqbn
+        end
+        return "arduino:avr:uno"
+      end
+
+      local function arduino_cmd()
+        local binary = vim.fn.expand("~/go/bin/arduino-language-server")
+        local cli = "/opt/homebrew/bin/arduino-cli"
+        if vim.fn.executable(binary) == 0 then
+          vim.notify("arduino-language-server が見つかりません: " .. binary, vim.log.levels.ERROR)
+        end
+        if vim.fn.executable(cli) == 0 then
+          vim.notify("arduino-cli が見つかりません: " .. cli, vim.log.levels.ERROR)
+        end
+        return {
+          binary,
+          "-cli", cli,
+          "-cli-config", vim.fn.expand("~/Library/Arduino15/arduino-cli.yaml"),
+          "-fqbn", board_fqbn(),
+        }
+      end
+
+      local function attach_keymaps(bufnr)
         local map = function(mode, lhs, rhs, desc)
-          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, noremap = true, desc = desc })
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
         end
-        map("n", "K", vim.lsp.buf.hover, "LSP Hover")
-        map("n", "gd", vim.lsp.buf.definition, "Go to Definition")
-        map("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
-        map("n", "gi", vim.lsp.buf.implementation, "Go to Implementation")
-        map("n", "gr", vim.lsp.buf.references, "References")
-        map("n", "gt", vim.lsp.buf.type_definition, "Type Definition")
-        map("n", "<leader>rn", vim.lsp.buf.rename, "Rename Symbol")
-        map("n", "<leader>ca", vim.lsp.buf.code_action, "Code Action")
-        map("n", "gl", vim.diagnostic.open_float, "Line Diagnostics")
-        map("n", "[d", vim.diagnostic.goto_prev, "Prev Diagnostic")
-        map("n", "]d", vim.diagnostic.goto_next, "Next Diagnostic")
-        map({ "n", "v" }, "<leader>f", function()
-          vim.lsp.buf.format({ async = false })
-        end, "Format")
-
-        -- tsserver はフォーマット無効化（Prettier 等と競合回避）
-        if client.name == "ts_ls" then
-          client.server_capabilities.documentFormattingProvider = false
-          client.server_capabilities.documentRangeFormattingProvider = false
-        end
+        map("n", "gd", vim.lsp.buf.definition, "Go to definition")
+        map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+        map("n", "gi", vim.lsp.buf.implementation, "Go to implementation")
+        map("n", "gr", vim.lsp.buf.references, "Find references")
+        map("n", "K", vim.lsp.buf.hover, "Hover")
+        map("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+        map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
+        map("n", "<leader>cf", function()
+          vim.lsp.buf.format({ async = true })
+        end, "Format buffer")
       end
 
-      local lspconfig = require("lspconfig")
-
-      -- mason-lspconfig は自動有効化を無効化して、個別に setup する
-      local ok_mlsp, mason_lspconfig = pcall(require, "mason-lspconfig")
-      if ok_mlsp then
-        mason_lspconfig.setup({ automatic_enable = false, ensure_installed = { "prismals" } })
-        -- 個別設定（下のフォールバックと同一設定）
-        lspconfig.ts_ls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = {
-            typescript = { preferences = { includePackageJsonAutoImports = "on" } },
-            javascript = { preferences = { includePackageJsonAutoImports = "on" } },
-          },
-          filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+      local function run_cli(subcommand, extra_args)
+        local file = vim.api.nvim_buf_get_name(0)
+        if file == "" then
+          vim.notify("ファイルが保存されていません", vim.log.levels.ERROR)
+          return
+        end
+        local fqbn = board_fqbn()
+        local sketch_dir = vim.fn.fnamemodify(file, ":p:h")
+        local cmd = {
+          "/opt/homebrew/bin/arduino-cli",
+          subcommand,
+          "--fqbn",
+          fqbn,
+          sketch_dir,
+        }
+        if extra_args then
+          for _, value in ipairs(extra_args) do
+            table.insert(cmd, value)
+          end
+        end
+        local title = "arduino-cli " .. subcommand
+        local lines = {}
+        vim.fn.jobstart(cmd, {
+          stdout_buffered = true,
+          stderr_buffered = true,
+          on_stdout = function(_, data)
+            if data then
+              for _, line in ipairs(data) do
+                if line ~= "" then
+                  table.insert(lines, line)
+                end
+              end
+            end
+          end,
+          on_stderr = function(_, data)
+            if data then
+              for _, line in ipairs(data) do
+                if line ~= "" then
+                  table.insert(lines, line)
+                end
+              end
+            end
+          end,
+          on_exit = function(_, code)
+            vim.schedule(function()
+              vim.fn.setqflist({}, " ", { title = title, lines = lines })
+              if code == 0 then
+                vim.notify(title .. " 成功", vim.log.levels.INFO)
+              else
+                vim.notify(title .. " 失敗", vim.log.levels.ERROR)
+                vim.cmd("copen")
+              end
+            end)
+          end,
         })
-        lspconfig.tailwindcss.setup({ capabilities = capabilities, on_attach = on_attach })
-        lspconfig.html.setup({ capabilities = capabilities, on_attach = on_attach, filetypes = { "html", "templ" } })
-        lspconfig.cssls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "css", "scss", "less" },
-          settings = { css = { validate = true }, less = { validate = true }, scss = { validate = true } },
-        })
-        local ok_ss, schemastore = pcall(require, "schemastore")
-        lspconfig.jsonls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = { json = { schemas = ok_ss and schemastore.json.schemas() or nil, validate = { enable = true } } },
-        })
-        lspconfig.volar.setup({ capabilities = capabilities, on_attach = on_attach, filetypes = { "vue" } })
-        lspconfig.emmet_ls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
-        })
-        lspconfig.lua_ls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = {
-            Lua = {
-              runtime = { version = "LuaJIT" },
-              diagnostics = { globals = { "vim" } },
-              workspace = { checkThirdParty = false, library = { vim.env.VIMRUNTIME } },
-              telemetry = { enable = false },
-            },
-          },
-        })
-        lspconfig.prismals.setup({ capabilities = capabilities, on_attach = on_attach })
-      else
-        -- フォールバック: 既存の個別設定
-        lspconfig.ts_ls.setup({ capabilities = capabilities, on_attach = on_attach })
-        lspconfig.tailwindcss.setup({ capabilities = capabilities, on_attach = on_attach })
-        lspconfig.html.setup({ capabilities = capabilities, on_attach = on_attach, filetypes = { "html", "templ" } })
-        lspconfig.cssls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "css", "scss", "less" },
-          settings = { css = { validate = true }, less = { validate = true }, scss = { validate = true } },
-        })
-        local ok_ss, schemastore = pcall(require, "schemastore")
-        lspconfig.jsonls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = { json = { schemas = ok_ss and schemastore.json.schemas() or nil, validate = { enable = true } } },
-        })
-        lspconfig.volar.setup({ capabilities = capabilities, on_attach = on_attach, filetypes = { "vue" } })
-        lspconfig.emmet_ls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
-        })
-        lspconfig.lua_ls.setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = {
-            Lua = {
-              runtime = { version = "LuaJIT" },
-              diagnostics = { globals = { "vim" } },
-              workspace = { checkThirdParty = false, library = { vim.env.VIMRUNTIME } },
-              telemetry = { enable = false },
-            },
-          },
-        })
-        lspconfig.prismals.setup({ capabilities = capabilities, on_attach = on_attach })
       end
+
+      if not vim.g.arduino_commands_loaded then
+        vim.g.arduino_commands_loaded = true
+
+        vim.api.nvim_create_user_command("ArduinoFqbn", function(opts)
+          vim.g.arduino_fqbn = opts.args
+          vim.notify("FQBN を " .. opts.args .. " に設定しました", vim.log.levels.INFO)
+          pcall(vim.cmd.LspRestart, "arduino_language_server")
+        end, { nargs = 1 })
+
+        vim.api.nvim_create_user_command("ArduinoCompile", function()
+          run_cli("compile")
+        end, {})
+
+        vim.api.nvim_create_user_command("ArduinoUpload", function(opts)
+          local args = nil
+          if opts.args ~= "" then
+            args = { "--port", opts.args }
+          end
+          run_cli("upload", args)
+        end, { nargs = "?" })
+      end
+
+      lspconfig.arduino_language_server.setup({
+        capabilities = capabilities,
+        on_attach = attach_keymaps,
+        cmd = arduino_cmd(),
+        filetypes = { "arduino" },
+        root_dir = function(fname)
+          local arduino_root = util.search_ancestors(fname, function(path)
+            return util.path.is_file(util.path.join(path, "arduino.json"))
+          end)
+          return arduino_root or util.root_pattern(".git")(fname) or util.path.dirname(fname)
+        end,
+        before_init = function(_, config)
+          config.cmd = arduino_cmd()
+        end,
+        on_new_config = function(config)
+          config.cmd = arduino_cmd()
+        end,
+      })
     end,
-  },
-
-  -- Telescope も VSCode 内では無効化（任意）
-  {
-    "nvim-telescope/telescope.nvim",
-    cond = not vim.g.vscode,
-    keys = {
-      { "<leader>d", "<cmd>Telescope diagnostics<CR>", desc = "Telescope diagnostics" },
-      { "<leader>b", "<cmd>lua vim.diagnostic.open_float()<CR>", desc = "Diagnostics detail" },
-    },
   },
 }

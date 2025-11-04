@@ -1,8 +1,18 @@
 vim.keymap.set('n', '<C-m>', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
 
-vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI"}, {
+-- Insert モードを抜けて Normal に戻った時だけ自動保存
+local autosave_group = vim.api.nvim_create_augroup("autosave_on_insertleave", { clear = true })
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = autosave_group,
   pattern = "*",
-  command = "silent! write"
+  callback = function(args)
+    local buf = args.buf
+    local bo = vim.bo[buf]
+    local name = vim.api.nvim_buf_get_name(buf)
+    if bo.modifiable and bo.modified and bo.buftype == "" and not bo.readonly and name ~= "" then
+      vim.cmd("silent update")
+    end
+  end,
 })
 
 -- Copilot Chat

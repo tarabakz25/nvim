@@ -1,18 +1,15 @@
--- lua/plugins/cmp.lua
+-- シンプルな補完設定（LSP不要）
 return {
   "hrsh7th/nvim-cmp",
+  event = "InsertEnter",
   dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
-    "hrsh7th/cmp-cmdline",
-    "hrsh7th/cmp-nvim-lua",
-    "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip",
-    "rafamadriz/friendly-snippets",
-    "onsails/lspkind.nvim",
-    -- Emmet completion source (bridges emmet-vim into nvim-cmp)
-    "dcampos/cmp-emmet-vim",
+    "hrsh7th/cmp-nvim-lsp",    -- LSP補完
+    "hrsh7th/cmp-buffer",      -- バッファ補完
+    "hrsh7th/cmp-path",         -- パス補完
+    "hrsh7th/cmp-cmdline",      -- コマンドライン補完
+    "L3MON4D3/LuaSnip",         -- スニペット
+    "saadparwaiz1/cmp_luasnip", -- LuaSnip連携
+    "onsails/lspkind.nvim",     -- アイコン
   },
   config = function()
     local cmp = require("cmp")
@@ -29,44 +26,32 @@ return {
         ["<S-Tab>"] = cmp.mapping.select_prev_item(),
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
         ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(),
       }),
       sources = cmp.config.sources({
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-        { name = "path" },
+        { name = "nvim_lsp", priority = 15 },
+        { name = "luasnip", priority = 10 },
+        { name = "buffer", priority = 8 },
+        { name = "path", priority = 7 },
       }),
       formatting = {
         format = lspkind.cmp_format({
           mode = "symbol_text",
           maxwidth = 50,
-          ellipsis_char = "...",
         }),
       },
-      experimental = {
-        ghost_text = true,
+      performance = {
+        max_view_entries = 20,  -- 表示する候補数を制限
       },
-    })
-
-    -- Filetype-specific sources to prioritize Emmet in web/React buffers
-    cmp.setup.filetype({ "html", "javascriptreact", "typescriptreact" }, {
-      sources = cmp.config.sources({
-        { name = "emmet_vim" },
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-        { name = "path" },
-      }),
     })
     
     -- コマンドライン補完
     cmp.setup.cmdline(":", {
       mapping = cmp.mapping.preset.cmdline(),
-      sources = cmp.config.sources({
+      sources = {
         { name = "path" },
-      }, {
         { name = "cmdline" },
-      }),
+      },
     })
     
     -- 検索補完

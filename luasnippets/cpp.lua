@@ -3,7 +3,6 @@ local s = ls.snippet
 local t = ls.text_node
 local i = ls.insert_node
 
-
 return {
   s("kyopro", {
     t({ "#include <bits/stdc++.h>",

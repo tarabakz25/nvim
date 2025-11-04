@@ -1,8 +1,11 @@
 return {
-  "scottmckendry/cyberdream.nvim",
+  "nanotech/jellybeans.vim",
+  name = "jellybeans",
   lazy = false,
   priority = 1000,
   config = function()
-    vim.cmd.colorscheme("cyberdream")
+    vim.opt.termguicolors = true
+    vim.cmd.colorscheme("jellybeans")
   end,
 }
+

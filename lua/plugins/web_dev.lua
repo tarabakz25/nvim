@@ -6,22 +6,6 @@ return {
     lazy = true,
   },
   
-  -- Emmet for HTML/CSS
-  {
-    "mattn/emmet-vim",
-    ft = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
-    config = function()
-      vim.g.user_emmet_leader_key = "<C-e>"
-      vim.g.user_emmet_settings = {
-        javascript = {
-          extends = "jsx",
-        },
-        typescript = {
-          extends = "tsx",
-        },
-      }
-    end,
-  },
   
   -- Auto close HTML tags
   {
