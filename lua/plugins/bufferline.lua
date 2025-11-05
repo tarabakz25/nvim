@@ -51,8 +51,8 @@ return {
         sort_by = "insert_after_current",
         offsets = {
           {
-            filetype = "NvimTree",
-            text = "File Explorer",
+            filetype = "neo-tree",
+            text = "Neo-tree",
             text_align = "center",
             separator = true,
           },

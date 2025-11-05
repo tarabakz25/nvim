@@ -1,4 +1,5 @@
-vim.keymap.set('n', '<C-m>', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-m>', ':Neotree toggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-n>', ':Neotree focus<CR>',  { noremap = true, silent = true })
 
 -- Insert モードを抜けて Normal に戻った時だけ自動保存
 local autosave_group = vim.api.nvim_create_augroup("autosave_on_insertleave", { clear = true })
@@ -20,8 +21,8 @@ vim.keymap.set("n", "<leader>cc", ":CopilotChat<CR>", { noremap = true, silent =
 vim.keymap.set("v", "<leader>cc", ":CopilotChat<CR>", { noremap = true, silent = true, desc = "選択範囲で Copilot Chat" })
 
 -- Web開発用キーマップ
-vim.keymap.set("n", "<leader>ls", ":LiveServerStart<CR>", { noremap = true, silent = true, desc = "Live Server 開始" })
-vim.keymap.set("n", "<leader>lq", ":LiveServerStop<CR>", { noremap = true, silent = true, desc = "Live Server 停止" })
+vim.keymap.set("n", "<leader>ls", ":BunServerStart<CR>", { noremap = true, silent = true, desc = "Live Server (bun) 開始" })
+vim.keymap.set("n", "<leader>lq", ":BunServerStop<CR>",  { noremap = true, silent = true, desc = "Live Server (bun) 停止" })
 vim.keymap.set("n", "<leader>pf", ":Prettier<CR>", { noremap = true, silent = true, desc = "Prettier でフォーマット" })
 vim.keymap.set("n", "<leader>li", ":Lint<CR>", { noremap = true, silent = true, desc = "Lint 実行" })
 

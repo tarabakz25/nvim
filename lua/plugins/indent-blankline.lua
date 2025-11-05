@@ -46,6 +46,7 @@ return {
           "help",
           "dashboard",
           "NvimTree",
+          "neo-tree",
           "Trouble",
           "trouble",
           "lazy",

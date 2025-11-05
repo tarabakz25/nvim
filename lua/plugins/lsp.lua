@@ -8,8 +8,7 @@ return {
     config = function()
       vim.filetype.add({ extension = { ino = "arduino" } })
 
-      local lspconfig = require("lspconfig")
-      local util = require("lspconfig.util")
+      -- capabilities (augmented by nvim-cmp if present)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
@@ -117,12 +116,6 @@ return {
       if not vim.g.arduino_commands_loaded then
         vim.g.arduino_commands_loaded = true
 
-        vim.api.nvim_create_user_command("ArduinoFqbn", function(opts)
-          vim.g.arduino_fqbn = opts.args
-          vim.notify("FQBN を " .. opts.args .. " に設定しました", vim.log.levels.INFO)
-          pcall(vim.cmd.LspRestart, "arduino_language_server")
-        end, { nargs = 1 })
-
         vim.api.nvim_create_user_command("ArduinoCompile", function()
           run_cli("compile")
         end, {})
@@ -136,24 +129,35 @@ return {
         end, { nargs = "?" })
       end
 
-      lspconfig.arduino_language_server.setup({
+      -- Migrate away from require('lspconfig') to vim.lsp.config/vim.lsp.enable
+      -- See :help lspconfig-nvim-0.11
+      vim.lsp.config("arduino_language_server", {
         capabilities = capabilities,
-        on_attach = attach_keymaps,
         cmd = arduino_cmd(),
         filetypes = { "arduino" },
-        root_dir = function(fname)
-          local arduino_root = util.search_ancestors(fname, function(path)
-            return util.path.is_file(util.path.join(path, "arduino.json"))
-          end)
-          return arduino_root or util.root_pattern(".git")(fname) or util.path.dirname(fname)
-        end,
-        before_init = function(_, config)
-          config.cmd = arduino_cmd()
-        end,
-        on_new_config = function(config)
-          config.cmd = arduino_cmd()
+        -- Prefer root markers; falls back to .git if present
+        root_markers = { "arduino.json", ".git" },
+      })
+
+      -- Keymaps when any LSP attaches
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          attach_keymaps(args.buf)
         end,
       })
+
+      -- Enable the server (starts per-filetype when needed)
+      vim.lsp.enable("arduino_language_server")
+
+      -- Commands
+      -- Restart arduino_language_server after FQBN changes so new cmd() is used
+      vim.api.nvim_create_user_command("ArduinoFqbn", function(opts)
+        vim.g.arduino_fqbn = opts.args
+        vim.notify("FQBN を " .. opts.args .. " に設定しました", vim.log.levels.INFO)
+        -- disable then re-enable to restart with updated cmd
+        vim.lsp.enable("arduino_language_server", false)
+        vim.lsp.enable("arduino_language_server", true)
+      end, { nargs = 1 })
     end,
   },
 }
