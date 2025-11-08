@@ -15,6 +15,8 @@ return {
     close_if_last_window = true,
     popup_border_style = "rounded",
     filesystem = {
+      visible = true,
+      hide_dotfiles = false,
       bind_to_cwd = true,
       follow_current_file = { enabled = true },
       use_libuv_file_watcher = true,

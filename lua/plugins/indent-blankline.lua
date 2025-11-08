@@ -1,71 +1,45 @@
+-- lua/plugins/indent-blankline.lua
 return {
   "lukas-reineke/indent-blankline.nvim",
   main = "ibl",
-  event = { "BufReadPost", "BufNewFile" },
-  config = function()
-    require("ibl").setup({
-      indent = {
-        char = "│",
-        tab_char = "│",
-        highlight = "IblIndent",
-        smart_indent_cap = true,
-        priority = 1,
-      },
-      whitespace = {
-        highlight = "IblWhitespace",
-        remove_blankline_trail = true,
-      },
-      scope = {
-        enabled = true,
-        char = "│",
-        show_start = true,
-        show_end = false,
-        show_exact_scope = false,
-        injected_languages = true,
-        highlight = "IblScope",
-        priority = 1024,
-        include = {
-          node_type = {
-            ["*"] = {
-              "class",
-              "function",
-              "method",
-              "^if",
-              "^while",
-              "^for",
-              "^object",
-              "^table",
-              "block",
-              "arguments",
-            },
-          },
-        },
-      },
-      exclude = {
-        filetypes = {
-          "help",
-          "dashboard",
-          "NvimTree",
-          "neo-tree",
-          "Trouble",
-          "trouble",
-          "lazy",
-          "mason",
-          "notify",
-          "toggleterm",
-          "lazyterm",
-        },
-        buftypes = {
-          "terminal",
-          "nofile",
-          "quickfix",
-          "prompt",
-        },
-      },
-    })
-    
-    -- Treesitter連携でスコープハイライト
+  opts = {
+    indent = {
+      char = "│",
+      tab_char = "│",
+    },
+    scope = {
+      enabled = true,
+      show_start = false,
+      show_end = false,
+    },
+    exclude = {
+      filetypes = { "help", "lazy", "mason", "NvimTree", "Trouble", "dashboard" },
+      buftypes = { "terminal", "nofile" },
+    },
+  },
+  config = function(_, opts)
+    -- 1) iblを初期化
+    require("ibl").setup(opts)
+
+    -- 2) hooksを正しくrequireしてから使う（ここがエラー箇所の本質）
     local hooks = require("ibl.hooks")
-    hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
+
+    -- ハイライトは前景のみ指定（bgは触らない）
+    hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+      vim.api.nvim_set_hl(0, "IblIndent", { fg = "#5e5e5e", nocombine = true })
+      vim.api.nvim_set_hl(0, "IblScope",  { fg = "#aaaaaa", nocombine = true })
+    end)
+
+    -- カラースキーム変更時にも再適用（背景はターミナルそのまま）
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = vim.api.nvim_create_augroup("ibl-rehighlight", { clear = true }),
+      callback = function()
+        hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+          vim.api.nvim_set_hl(0, "IblIndent", { fg = "#5e5e5e", nocombine = true })
+          vim.api.nvim_set_hl(0, "IblScope",  { fg = "#aaaaaa", nocombine = true })
+        end)
+        hooks.trigger(hooks.type.HIGHLIGHT_SETUP)
+      end,
+    })
   end,
 }
