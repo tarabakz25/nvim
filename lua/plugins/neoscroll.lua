@@ -2,19 +2,9 @@ return {
   "karb94/neoscroll.nvim",
   event = "VeryLazy",
   config = function()
+    -- Use helper functions and normal keymaps (set_mappings is deprecated)
     require("neoscroll").setup({
-      -- デフォルトのマッピング
-      mappings = {
-        "<C-u>",
-        "<C-d>",
-        "<C-b>",
-        "<C-f>",
-        "<C-y>",
-        "<C-e>",
-        "zt",
-        "zz",
-        "zb",
-      },
+      mappings = {}, -- we'll map keys ourselves below
       hide_cursor = true,
       stop_eof = true,
       respect_scrolloff = false,
@@ -22,21 +12,24 @@ return {
       easing_function = nil,
       pre_hook = nil,
       post_hook = nil,
-      performance_mode = true,  -- パフォーマンスモードを有効化
+      performance_mode = true,
     })
-    
-    -- カスタムスクロールアニメーション設定（アニメーション時間を短縮）
-    local t = {}
-    t["<C-u>"] = { "scroll", { "-vim.wo.scroll", "true", "50" } }  -- 250 -> 50
-    t["<C-d>"] = { "scroll", { "vim.wo.scroll", "true", "50" } }  -- 250 -> 50
-    t["<C-b>"] = { "scroll", { "-vim.api.nvim_win_get_height(0)", "true", "150" } }  -- 450 -> 150
-    t["<C-f>"] = { "scroll", { "vim.api.nvim_win_get_height(0)", "true", "150" } }  -- 450 -> 150
-    t["<C-y>"] = { "scroll", { "-0.10", "false", "50" } }  -- 100 -> 50
-    t["<C-e>"] = { "scroll", { "0.10", "false", "50" } }  -- 100 -> 50
-    t["zt"] = { "zt", { "100" } }  -- 250 -> 100
-    t["zz"] = { "zz", { "100" } }  -- 250 -> 100
-    t["zb"] = { "zb", { "100" } }  -- 250 -> 100
-    
-    require("neoscroll.config").set_mappings(t)
+
+    local neoscroll = require("neoscroll")
+    local modes = { "n", "v", "x" }
+    local map = function(lhs, rhs)
+      vim.keymap.set(modes, lhs, rhs, { silent = true, desc = "Neoscroll " .. lhs })
+    end
+
+    -- durations tuned to your previous config
+    map("<C-u>", function() neoscroll.ctrl_u({ duration = 50 }) end)
+    map("<C-d>", function() neoscroll.ctrl_d({ duration = 50 }) end)
+    map("<C-b>", function() neoscroll.ctrl_b({ duration = 150 }) end)
+    map("<C-f>", function() neoscroll.ctrl_f({ duration = 150 }) end)
+    map("<C-y>", function() neoscroll.scroll(-0.10, { move_cursor = false, duration = 50 }) end)
+    map("<C-e>", function() neoscroll.scroll( 0.10, { move_cursor = false, duration = 50 }) end)
+    map("zt",     function() neoscroll.zt({ duration = 100 }) end)
+    map("zz",     function() neoscroll.zz({ duration = 100 }) end)
+    map("zb",     function() neoscroll.zb({ duration = 100 }) end)
   end,
 }
