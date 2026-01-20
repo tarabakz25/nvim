@@ -5,6 +5,29 @@ vim.o.expandtab = true
 vim.opt.clipboard:append { "unnamedplus" }
 vim.g.mapleader = " "
 
+-- GUI 起動などで $PATH が最小になる環境でも外部コマンドを見つけられるようにする
+-- (Telescope の rg など)
+if vim.fn.has("macunix") == 1 then
+  local path = vim.env.PATH or ""
+
+  local function prepend_path(dir)
+    if not dir or dir == "" then
+      return
+    end
+
+    local padded = ":" .. path .. ":"
+    if not padded:find(":" .. dir .. ":", 1, true) then
+      path = dir .. ":" .. path
+    end
+  end
+
+  prepend_path("/opt/homebrew/bin")
+  prepend_path("/usr/local/bin")
+  prepend_path(vim.fn.expand("~/.local/bin"))
+
+  vim.env.PATH = path
+end
+
 vim.o.autoindent = true
 vim.o.smartindent = true
 vim.o.cindent = true
@@ -66,6 +89,21 @@ vim.api.nvim_create_autocmd("BufReadPre", {
     else
       vim.g.indent_blankline_enabled = true
       vim.opt.syntax = "ON"
+    end
+  end,
+})
+
+-- Insert モードを抜けて Normal に戻った時だけ自動保存
+local autosave_group = vim.api.nvim_create_augroup("autosave_on_insertleave", { clear = true })
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = autosave_group,
+  pattern = "*",
+  callback = function(args)
+    local buf = args.buf
+    local bo = vim.bo[buf]
+    local name = vim.api.nvim_buf_get_name(buf)
+    if bo.modifiable and bo.modified and bo.buftype == "" and not bo.readonly and name ~= "" then
+      vim.cmd("silent update")
     end
   end,
 })

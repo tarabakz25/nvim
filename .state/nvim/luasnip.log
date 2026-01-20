@@ -1,0 +1,32 @@
+ERROR | 00:17:01 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 00:17:01 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:12:20 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:12:20 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:36 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:36 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:40 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:40 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:46 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:14:46 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:16 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:16 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:36 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:36 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:40 | lua-loader: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'
+ERROR | 09:15:40 | lua-loader: Could not create collection at /Users/kz/.config/nvim/luasnippets: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:250: Could not create watcher: ...share/nvim/lazy/LuaSnip/lua/luasnip/loaders/from_lua.lua:103: Failed to load /Users/kz/.config/nvim/luasnippets/cpp.lua
+      | : /Users/kz/.config/nvim/luasnippets/cpp.lua:20: ')' expected (to close '(' at line 7) near '}'

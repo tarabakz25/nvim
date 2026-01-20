@@ -7,7 +7,7 @@ local function apply_transparent_background()
     -- 行番号/記号
     "SignColumn", "LineNr", "CursorLineNr", "FoldColumn",
     -- ステータス/フロート/ボーダー
-    "StatusLine", "StatusLineNC", "NormalFloat", "FloatBorder",
+    "StatusLine", "StatusLineNC", "WinBar", "WinBarNC", "NormalFloat", "FloatBorder",
     -- プラグイン系
     "NeoTreeNormal", "TelescopeNormal", "TelescopeBorder",
     -- 補完メニュー

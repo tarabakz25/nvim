@@ -8,6 +8,77 @@ return {
   config = function()
     local telescope = require("telescope")
     local actions = require("telescope.actions")
+    local builtin = require("telescope.builtin")
+
+    local has_rg = vim.fn.executable("rg") == 1
+    local has_fd = vim.fn.executable("fd") == 1
+
+    local find_files_command
+    if has_rg then
+      find_files_command = {
+        "rg",
+        "--files",
+        "--hidden",
+        "--glob",
+        "!**/.git/*",
+        "--glob",
+        "!**/node_modules/*",
+        "--glob",
+        "!**/dist/*",
+        "--glob",
+        "!**/build/*",
+      }
+    elseif has_fd then
+      find_files_command = {
+        "fd",
+        "--type",
+        "f",
+        "--hidden",
+        "--exclude",
+        ".git",
+        "--exclude",
+        "node_modules",
+        "--exclude",
+        "dist",
+        "--exclude",
+        "build",
+      }
+    else
+      find_files_command = {
+        "find",
+        ".",
+        "-path",
+        "*/.git",
+        "-prune",
+        "-o",
+        "-path",
+        "*/node_modules",
+        "-prune",
+        "-o",
+        "-path",
+        "*/dist",
+        "-prune",
+        "-o",
+        "-path",
+        "*/build",
+        "-prune",
+        "-o",
+        "-type",
+        "f",
+        "-print",
+      }
+    end
+
+    local function require_rg(feature)
+      if has_rg then
+        return true
+      end
+      vim.notify(
+        ("Telescope %s requires ripgrep (`rg`). Install it and ensure it is on $PATH."):format(feature),
+        vim.log.levels.ERROR
+      )
+      return false
+    end
 
     telescope.setup({
       defaults = {
@@ -54,7 +125,7 @@ return {
         find_files = {
           theme = "dropdown",
           previewer = false,
-          find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+          find_command = find_files_command,
         },
         live_grep = {
           additional_args = function()
@@ -70,16 +141,24 @@ return {
 
     -- キーマッピング設定
     local keymap = vim.keymap
-    keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "ファイル検索" })
-    keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "文字列検索" })
-    keymap.set("n", "<leader>fw", "<cmd>Telescope grep_string<cr>", { desc = "カーソル下の単語を検索" })
-    keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "バッファ検索" })
-    keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", { desc = "ヘルプ検索" })
-    keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "最近開いたファイル" })
-    keymap.set("n", "<leader>fc", "<cmd>Telescope commands<cr>", { desc = "コマンド検索" })
-    keymap.set("n", "<leader>fk", "<cmd>Telescope keymaps<cr>", { desc = "キーマップ検索" })
-    keymap.set("n", "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", { desc = "ドキュメントシンボル検索" })
-    keymap.set("n", "<leader>fS", "<cmd>Telescope lsp_workspace_symbols<cr>", { desc = "ワークスペースシンボル検索" })
+    keymap.set("n", "<leader>ff", builtin.find_files, { desc = "ファイル検索" })
+    keymap.set("n", "<leader>fg", function()
+      if require_rg("live_grep") then
+        builtin.live_grep()
+      end
+    end, { desc = "文字列検索" })
+    keymap.set("n", "<leader>fw", function()
+      if require_rg("grep_string") then
+        builtin.grep_string()
+      end
+    end, { desc = "カーソル下の単語を検索" })
+    keymap.set("n", "<leader>fb", builtin.buffers, { desc = "バッファ検索" })
+    keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "ヘルプ検索" })
+    keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "最近開いたファイル" })
+    keymap.set("n", "<leader>fc", builtin.commands, { desc = "コマンド検索" })
+    keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "キーマップ検索" })
+    keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "ドキュメントシンボル検索" })
+    keymap.set("n", "<leader>fS", builtin.lsp_workspace_symbols, { desc = "ワークスペースシンボル検索" })
   end,
   cmd = "Telescope",
 }

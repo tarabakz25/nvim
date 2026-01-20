@@ -1,5 +1,6 @@
 return {
   "akinsho/bufferline.nvim",
+  enabled = false,
   version = "*",
   dependencies = "nvim-tree/nvim-web-devicons",
   event = "VeryLazy",
@@ -51,8 +52,8 @@ return {
         sort_by = "insert_after_current",
         offsets = {
           {
-            filetype = "neo-tree",
-            text = "Neo-tree",
+            filetype = "minifiles",
+            text = "File Explorer",
             text_align = "center",
             separator = true,
           },

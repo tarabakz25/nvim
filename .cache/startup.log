@@ -1,0 +1,14 @@
+
+  1: ~/.config/nvim/vim/_defaults.lua
+  2: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/ftplugin.vim
+  3: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/indent.vim
+  4: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/filetype.lua
+  5: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/syntax/syntax.vim
+  6: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/syntax/synload.vim
+  7: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/plugin/gzip.vim
+  8: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/plugin/matchit.vim
+  9: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/pack/dist/opt/matchit/plugin/matchit.vim
+ 10: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/plugin/matchparen.vim
+ 11: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/plugin/netrwPlugin.vim
+ 12: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/pack/dist/opt/netrw/plugin/netrwPlugin.vim
+ 13: /opt/homebrew/Cellar/neovim/0.11.3/share/nvim/runtime/plugin/rplugin.vim

@@ -1,0 +1,11 @@
+vim.keymap.set('n', '<leader>e', function()
+  MiniFiles.open(vim.api.nvim_buf_get_name(0))
+end, { desc = 'Open mini.files' })
+
+vim.keymap.set('n', '<leader>ff', function() MiniPick.builtin.files() end, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>fg', function() MiniPick.builtin.grep_live() end, { desc = 'Grep' })
+vim.keymap.set('n', '<leader>fb', function() MiniPick.builtin.buffers() end, { desc = 'Buffers' })
+vim.keymap.set('n', '<leder>fh', function() MiniPick.builtin.help() end, { desc = 'Help' })
+vim.keymap.set('n', '<leader>tz', '<cmd>ZenMode<CR>', { desc = 'Zen Mode' })
+vim.keymap.set('n', 'j', '<Plug>(accelerated_jk_gj)', {})
+vim.keymap.set('n', 'k', '<Plug>(accelerated_jk_gk)', {})
